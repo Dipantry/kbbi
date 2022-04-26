@@ -5,7 +5,10 @@
   "license": "MIT",
   "require": {
     "php": "^8.0",
-    "rigsto/api-http-status": "^1.1"
+    "rigsto/api-http-status": "^1.1",
+    "guzzlehttp/guzzle": "^7.4",
+    "ext-libxml": "*",
+    "ext-dom": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.1",
