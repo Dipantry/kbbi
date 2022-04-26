@@ -28,7 +28,7 @@ class SearchWord
     }
 
     /* @throws KbbiResponseException|GuzzleException */
-    public function search(string $word)
+    protected function searchWord(string $word): array
     {
         libxml_use_internal_errors(true);
         $htmlString = $this->getHttp("/{$word}");
