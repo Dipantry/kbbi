@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace Dipantry\Kbbi\Tests;
 
@@ -6,7 +6,7 @@ use Dipantry\Kbbi\KBBI;
 
 class DebugTest extends TestCase
 {
-    public function testSuccessful(){
+    public function testDemokrasiSuccessful(){
         $kbbi = (new KBBI())->search('demokrasi', $this->getApplicationSession());
         self::assertNotEmpty($kbbi);
 
@@ -28,5 +28,13 @@ class DebugTest extends TestCase
                 }
             }
         }
+    }
+
+    public function testNotFound(){
+        $kbbi = (new KBBI())->search('lorem');
+
+        $decoded_data = $this->decodeContent($kbbi);
+        self::assertFalse($decoded_data['success']);
+        self::assertEquals('Kata tidak ditemukan', $decoded_data['message']);
     }
 }

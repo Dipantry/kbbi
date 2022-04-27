@@ -47,13 +47,17 @@ class SearchWord
         return $this->processResult($this->doc->getElementsByTagName('h2'));
     }
 
+    /* @throws KbbiResponseException */
     private function processResult(DOMNodeList $h2s): array {
         $results = [];
         foreach ($h2s as $index => $h2){
             $result['spelling'] = $h2->nodeValue;
 
-            $meaning_array = [];
             $list = $this->xpath->query("//ol[contains(@class, 'last-list-child')]//li");
+
+            if (count($list) == 0){
+                $this->checkError();
+            }
 
             $result['meanings'] = $this->processMeaning($list);
 
@@ -88,5 +92,13 @@ class SearchWord
             $category_array[] = $cat;
         }
         return $category_array;
+    }
+
+    /* @throws KbbiResponseException */
+    private function checkError(): void {
+        $notFound = $this->xpath->query("//h4[contains(@style, 'color:red')]");
+        if ($notFound->length > 0){
+            throw new KbbiResponseException('Kata tidak ditemukan');
+        }
     }
 }
