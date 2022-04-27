@@ -53,32 +53,43 @@ class SearchWord
         foreach ($h2s as $index => $h2){
             $result['spelling'] = $h2->nodeValue;
 
-            $list = $this->xpath->query("//ol[contains(@class, 'last-list-child')]//li");
+            $manySiblings = $this->xpath->query("following-sibling::ol[@class='last-list-child']//li", $h2);
+            $oneSibling = $this->xpath->query("following-sibling::ul[@class='adjusted-par']//li", $h2);
 
-            if (count($list) == 0){
+            if (count($manySiblings) > 0){
+                $result['meanings'] = $this->processMeanings($manySiblings);
+            } else if (count($oneSibling) > 0){
+                $result['meanings'] = $this->processMeanings($oneSibling);
+            } else {
                 $this->checkError();
             }
-
-            $result['meanings'] = $this->processMeaning($list);
 
             $results[] = $result;
         }
         return $results;
     }
 
-    private function processMeaning(DOMNodeList $meanings): array {
+    private function processMeanings(DOMNodeList $meanings): array {
         $meaning_array = [];
         foreach ($meanings as $index => $meaning){
             if ($index == $meanings->count() - 1){
                 continue;
             }
 
-            $mean['description'] = $meaning->childNodes->item(1)->nodeValue;
-            $mean['categories'] = $this->processCategory(
-                $this->xpath->query('.//font//i//span', $meaning)
-            );
+            try {
+                $description = $meaning->childNodes->item(1)->nodeValue;
+                if (preg_match('/[a-z]/i', $description)){
+                    $mean['description'] = $description;
+                } else {
+                    continue;
+                }
 
-            $meaning_array[] = $mean;
+                $mean['categories'] = $this->processCategory(
+                    $this->xpath->query('.//font//i//span', $meaning)
+                );
+
+                $meaning_array[] = $mean;
+            } catch (Exception) { continue; }
         }
         return $meaning_array;
     }
@@ -86,10 +97,12 @@ class SearchWord
     private function processCategory(DOMNodeList $categories): array {
         $category_array = [];
         foreach ($categories as $index => $category){
-            $cat['code'] = $category->nodeValue;
-            $cat['description'] = $category->attributes->getNamedItem('title')->nodeValue;
+            try {
+                $cat['code'] = $category->nodeValue;
+                $cat['description'] = $category->attributes->getNamedItem('title')->nodeValue;
 
-            $category_array[] = $cat;
+                $category_array[] = $cat;
+            } catch (Exception) { continue; }
         }
         return $category_array;
     }
