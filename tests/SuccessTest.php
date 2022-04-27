@@ -62,4 +62,23 @@ class SuccessTest extends TestCase
             self::assertCount(1, $content['meanings']);
         }
     }
+
+    public function testMultipleManyList(){
+        $kbbi = (new KBBI())->search('sayang', $this->getApplicationSession());
+        self::assertNotEmpty($kbbi);
+
+        $decoded_data = $this->decodeContent($kbbi);
+        self::assertTrue($decoded_data['success']);
+        self::assertCount(2, $decoded_data['data']);
+
+        foreach ($decoded_data['data'] as $index => $content){
+            self::assertNotEmpty($content['spelling']);
+
+            if ($index == 0) {
+                self::assertCount(3, $content['meanings']);
+            } else {
+                self::assertCount(4, $content['meanings']);
+            }
+        }
+    }
 }

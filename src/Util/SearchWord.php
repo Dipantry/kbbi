@@ -54,13 +54,15 @@ class SearchWord
         foreach ($h2s as $index => $h2){
             $result['spelling'] = $h2->nodeValue;
 
-            $manySiblings = $this->xpath->query("following-sibling::ol[@class='last-list-child']//li", $h2);
-            $oneSibling = $this->xpath->query("following-sibling::ul[@class='adjusted-par']//li", $h2);
+            $manySiblings = $this->xpath->query("following-sibling::ol[@class='last-list-child']", $h2);
+            $oneSibling = $this->xpath->query("following-sibling::ul[@class='adjusted-par']", $h2);
 
             if (count($manySiblings) > 0){
-                $result['meanings'] = $this->processMeanings($manySiblings);
+                $lis = $this->xpath->query(".//li", $manySiblings->item(0));
+                $result['meanings'] = $this->processMeanings($lis);
             } else if (count($oneSibling) > 0){
-                $result['meanings'] = $this->processMeaning($oneSibling->item(0));
+                $li = $this->xpath->query(".//li", $oneSibling->item(0));
+                $result['meanings'] = $this->processMeaning($li->item(0));
             } else {
                 $this->checkError();
                 $result['meanings'] = [];
