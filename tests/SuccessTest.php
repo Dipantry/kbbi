@@ -4,9 +4,9 @@ namespace Dipantry\Kbbi\Tests;
 
 use Dipantry\Kbbi\KBBI;
 
-class DebugTest extends TestCase
+class SuccessTest extends TestCase
 {
-    public function testDemokrasiSuccessful(){
+    public function testOneManyList(){
         $kbbi = (new KBBI())->search('demokrasi', $this->getApplicationSession());
         self::assertNotEmpty($kbbi);
 
@@ -30,7 +30,7 @@ class DebugTest extends TestCase
         }
     }
 
-    public function testMakanSuccessful(){
+    public function testOneManyAndOneSingleList(){
         $kbbi = (new KBBI())->search('makan', $this->getApplicationSession());
         self::assertNotEmpty($kbbi);
 
@@ -46,24 +46,20 @@ class DebugTest extends TestCase
             } else {
                 self::assertCount(1, $content['meanings']);
             }
-
-            foreach ($content['meanings'] as $meaning){
-                self::assertNotEmpty($meaning['description']);
-                self::assertGreaterThan(1, $meaning['categories']);
-
-                foreach ($meaning['categories'] as $category){
-                    self::assertNotEmpty($category['code']);
-                    self::assertNotEmpty($category['description']);
-                }
-            }
         }
     }
 
-    public function testNotFound(){
-        $kbbi = (new KBBI())->search('lorem');
+    public function testMultipleSingleList(){
+        $kbbi = (new KBBI())->search('aku', $this->getApplicationSession());
+        self::assertNotEmpty($kbbi);
 
         $decoded_data = $this->decodeContent($kbbi);
-        self::assertFalse($decoded_data['success']);
-        self::assertEquals('Kata tidak ditemukan', $decoded_data['message']);
+        self::assertTrue($decoded_data['success']);
+        self::assertCount(3, $decoded_data['data']);
+
+        foreach ($decoded_data['data'] as $index => $content){
+            self::assertNotEmpty($content['spelling']);
+            self::assertCount(1, $content['meanings']);
+        }
     }
 }

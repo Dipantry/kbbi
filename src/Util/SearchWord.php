@@ -4,6 +4,7 @@ namespace Dipantry\Kbbi\Util;
 
 use Dipantry\Kbbi\Exception\KbbiResponseException;
 use DOMDocument;
+use DOMElement;
 use DOMNodeList;
 use DOMXPath;
 use Exception;
@@ -59,9 +60,10 @@ class SearchWord
             if (count($manySiblings) > 0){
                 $result['meanings'] = $this->processMeanings($manySiblings);
             } else if (count($oneSibling) > 0){
-                $result['meanings'] = $this->processMeanings($oneSibling);
+                $result['meanings'] = $this->processMeaning($oneSibling->item(0));
             } else {
                 $this->checkError();
+                $result['meanings'] = [];
             }
 
             $results[] = $result;
@@ -92,6 +94,24 @@ class SearchWord
             } catch (Exception) { continue; }
         }
         return $meaning_array;
+    }
+
+    private function processMeaning(DOMElement $node){
+        try {
+            $description = $node->childNodes->item(1)->nodeValue;
+            if (preg_match('/[a-z]/i', $description)){
+                $mean['description'] = $description;
+            } else {
+                return [];
+            }
+
+            $mean['categories'] = $this->processCategory(
+                $this->xpath->query('.//font//i//span', $node)
+            );
+
+            $meaning_array[] = $mean;
+            return $meaning_array;
+        } catch (Exception) { return []; }
     }
 
     private function processCategory(DOMNodeList $categories): array {
