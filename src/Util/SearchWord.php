@@ -23,12 +23,12 @@ class SearchWord
     {
         try {
             $httpClient = new Client();
-            $response = $httpClient->get($this->kbbiUrl . $url, [
+            $response = $httpClient->get($this->kbbiUrl.$url, [
                 'headers' => [
-                    'Cookie' => '.AspNet.ApplicationCookie=' . $session,
-                ]
+                    'Cookie' => '.AspNet.ApplicationCookie='.$session,
+                ],
             ]);
-        } catch (Exception){
+        } catch (Exception) {
             throw new KbbiResponseException('Koneksi ke KBBI gagal');
         }
 
@@ -49,19 +49,20 @@ class SearchWord
     }
 
     /* @throws KbbiResponseException */
-    private function processResult(DOMNodeList $h2s): array {
+    private function processResult(DOMNodeList $h2s): array
+    {
         $results = [];
-        foreach ($h2s as $index => $h2){
+        foreach ($h2s as $index => $h2) {
             $result['spelling'] = $h2->nodeValue;
 
             $manySiblings = $this->xpath->query("following-sibling::ol[@class='last-list-child']", $h2);
             $oneSibling = $this->xpath->query("following-sibling::ul[@class='adjusted-par']", $h2);
 
-            if (count($manySiblings) > 0){
-                $lis = $this->xpath->query(".//li", $manySiblings->item(0));
+            if (count($manySiblings) > 0) {
+                $lis = $this->xpath->query('.//li', $manySiblings->item(0));
                 $result['meanings'] = $this->processMeanings($lis);
-            } else if (count($oneSibling) > 0){
-                $li = $this->xpath->query(".//li", $oneSibling->item(0));
+            } elseif (count($oneSibling) > 0) {
+                $li = $this->xpath->query('.//li', $oneSibling->item(0));
                 $result['meanings'] = $this->processMeaning($li->item(0));
             } else {
                 $this->checkError();
@@ -70,19 +71,21 @@ class SearchWord
 
             $results[] = $result;
         }
+
         return $results;
     }
 
-    private function processMeanings(DOMNodeList $meanings): array {
+    private function processMeanings(DOMNodeList $meanings): array
+    {
         $meaning_array = [];
-        foreach ($meanings as $index => $meaning){
-            if ($index == $meanings->count() - 1){
+        foreach ($meanings as $index => $meaning) {
+            if ($index == $meanings->count() - 1) {
                 continue;
             }
 
             try {
                 $description = $meaning->childNodes->item(1)->nodeValue;
-                if (preg_match('/[a-z]/i', $description)){
+                if (preg_match('/[a-z]/i', $description)) {
                     $mean['description'] = $description;
                 } else {
                     continue;
@@ -93,15 +96,19 @@ class SearchWord
                 );
 
                 $meaning_array[] = $mean;
-            } catch (Exception) { continue; }
+            } catch (Exception) {
+                continue;
+            }
         }
+
         return $meaning_array;
     }
 
-    private function processMeaning(DOMElement $node){
+    private function processMeaning(DOMElement $node)
+    {
         try {
             $description = $node->childNodes->item(1)->nodeValue;
-            if (preg_match('/[a-z]/i', $description)){
+            if (preg_match('/[a-z]/i', $description)) {
                 $mean['description'] = $description;
             } else {
                 return [];
@@ -112,27 +119,35 @@ class SearchWord
             );
 
             $meaning_array[] = $mean;
+
             return $meaning_array;
-        } catch (Exception) { return []; }
+        } catch (Exception) {
+            return [];
+        }
     }
 
-    private function processCategory(DOMNodeList $categories): array {
+    private function processCategory(DOMNodeList $categories): array
+    {
         $category_array = [];
-        foreach ($categories as $index => $category){
+        foreach ($categories as $index => $category) {
             try {
                 $cat['code'] = $category->nodeValue;
                 $cat['description'] = $category->attributes->getNamedItem('title')->nodeValue;
 
                 $category_array[] = $cat;
-            } catch (Exception) { continue; }
+            } catch (Exception) {
+                continue;
+            }
         }
+
         return $category_array;
     }
 
     /* @throws KbbiResponseException */
-    private function checkError(): void {
+    private function checkError(): void
+    {
         $notFound = $this->xpath->query("//h4[contains(@style, 'color:red')]");
-        if ($notFound->length > 0){
+        if ($notFound->length > 0) {
             throw new KbbiResponseException('Kata tidak ditemukan');
         }
     }
