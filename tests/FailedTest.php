@@ -6,7 +6,8 @@ use Dipantry\Kbbi\KBBI;
 
 class FailedTest extends TestCase
 {
-    public function testNotFound(){
+    public function testNotFound()
+    {
         $kbbi = (new KBBI())->search('lorem');
 
         $decoded_data = $this->decodeContent($kbbi);

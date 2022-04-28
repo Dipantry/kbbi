@@ -12,7 +12,7 @@ use Rigsto\ApiHttpStatus\HttpStatus;
 
 class KBBI extends SearchWord
 {
-    public function search(string $word, string $session = ""): JsonResponse
+    public function search(string $word, string $session = ''): JsonResponse
     {
         try {
             $response = $this->searchWord($word, $session);
@@ -21,13 +21,13 @@ class KBBI extends SearchWord
                 HttpStatus::BAD_REQUEST,
                 $e->getMessage()
             );
-        } catch (GuzzleException $e){
+        } catch (GuzzleException $e) {
             return ApiResources::generateResponse(
                 HttpStatus::BAD_REQUEST,
                 'Request Error',
                 $e->getMessage()
             );
-        } catch (Exception $e){
+        } catch (Exception $e) {
             return ApiResources::generateResponse(
                 HttpStatus::INTERNAL_SERVER_ERROR,
                 'Internal Server Error',
