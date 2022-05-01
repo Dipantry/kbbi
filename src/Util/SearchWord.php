@@ -146,9 +146,10 @@ class SearchWord
     /* @throws KbbiResponseException */
     private function checkError(): void
     {
-        $notFound = $this->xpath->query("//h4[contains(@style, 'color:red')]");
-        if ($notFound->length > 0) {
-            throw new KbbiResponseException('Kata tidak ditemukan');
+        $seeError = $this->xpath->query("//h4[contains(@style, 'color:red')]");
+        if ($seeError->length > 0) {
+            throw new KbbiResponseException(trim($seeError->item(0)->nodeValue));
         }
+        throw new KbbiResponseException('Pencarian terkena limit');
     }
 }

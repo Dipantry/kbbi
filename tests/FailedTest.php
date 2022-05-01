@@ -12,6 +12,6 @@ class FailedTest extends TestCase
 
         $decoded_data = $this->decodeContent($kbbi);
         self::assertFalse($decoded_data['success']);
-        self::assertEquals('Kata tidak ditemukan', $decoded_data['message']);
+        self::assertEquals('Entri tidak ditemukan.', $decoded_data['message']);
     }
 }
