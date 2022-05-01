@@ -150,6 +150,7 @@ class SearchWord
         if ($seeError->length > 0) {
             throw new KbbiResponseException(trim($seeError->item(0)->nodeValue));
         }
+
         throw new KbbiResponseException('Pencarian terkena limit');
     }
 }
