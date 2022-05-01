@@ -21,7 +21,7 @@ composer require dipantry/kbbi
 ```php
 use Dipantry\KBBI\KBBI;
 
-$response = (new KBBI())->request('demokrasi');
+$response = (new KBBI())->search('demokrasi');
 ```
 
 ## Response
@@ -96,6 +96,19 @@ Data response yang dikembalikan pada variabel `$response` berbentuk json. Jika A
 | `code`        | Kode kategori                              |
 | `description` | Deskripsi kategori                         |
 
+---
+# Bypass Limit
+Website KBBI menggunakan sistem limit apabila melakukan pencarian kata tanpa melakukan login pada website tersebut. Untuk menghindari hal ini, Anda dapat memasukkan kode `session` ketika Anda melakukan pencarian kata. Kode `session` dapat ditemukan di website KBBI setelah Anda melakukan login, lalu lakukan langkah berikut:
+
+`Inspect Element` -> `Storage` -> `Cookies` -> `.AspNet.ApplicationCookie`
+
+Untuk menggunakannya, masukkan kode `session` pada fungsi `search` sebagai parameter.
+
+```php
+use Dipantry\KBBI\KBBI;
+
+$response = (new KBBI())->search('demokrasi', $session);
+```
 
 ---
 # Testing
